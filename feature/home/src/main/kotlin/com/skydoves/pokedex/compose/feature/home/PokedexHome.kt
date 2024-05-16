@@ -55,14 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kmpalette.palette.graphics.Palette
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
-import com.skydoves.landscapist.palette.PalettePlugin
-import com.skydoves.landscapist.placeholder.shimmer.Shimmer
-import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.skydoves.pokedex.compose.core.data.repository.home.FakeHomeRepository
 import com.skydoves.pokedex.compose.core.designsystem.component.PokedexAppBar
 import com.skydoves.pokedex.compose.core.designsystem.component.PokedexCircularProgress
@@ -130,14 +124,16 @@ private fun SharedTransitionScope.HomeContent(
   }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun SharedTransitionScope.PokemonCard(
   animatedVisibilityScope: AnimatedVisibilityScope,
   pokemon: Pokemon,
 ) {
   val composeNavigator = currentComposeNavigator
-  var palette by remember { mutableStateOf<Palette?>(null) }
-  val backgroundColor by palette.paletteBackgroundColor()
+  //var palette by remember { mutableStateOf<Palette?>(null) }
+  //val backgroundColor by palette.paletteBackgroundColor()
+  val backgroundColor = PokedexTheme.colors.background
 
   Card(
     modifier = Modifier
@@ -157,6 +153,8 @@ private fun SharedTransitionScope.PokemonCard(
     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
   ) {
     GlideImage(
+      model = pokemon.imageUrl,
+      contentDescription = pokemon.name,
       modifier = Modifier
         .align(Alignment.CenterHorizontally)
         .padding(top = 20.dp)
@@ -167,37 +165,15 @@ private fun SharedTransitionScope.PokemonCard(
           animatedVisibilityScope = animatedVisibilityScope,
           boundsTransform = boundsTransform,
         ),
-      imageModel = { pokemon.imageUrl },
-      imageOptions = ImageOptions(contentScale = ContentScale.Inside),
-      component = rememberImageComponent {
-        +CrossfadePlugin()
-        +ShimmerPlugin(
-          Shimmer.Resonate(
-            baseColor = Color.Transparent,
-            highlightColor = Color.LightGray,
-          ),
-        )
-
-        if (!LocalInspectionMode.current) {
-          +PalettePlugin(
-            imageModel = pokemon.imageUrl,
-            useCache = true,
-            paletteLoadedListener = { palette = it },
-          )
-        }
-      },
-      previewPlaceholder = painterResource(
-        id = R.drawable.pokemon_preview,
-      ),
+      contentScale = ContentScale.Inside
     )
 
     Text(
       modifier = Modifier
         .align(Alignment.CenterHorizontally)
         .fillMaxWidth()
-        .pokedexSharedElement(
-          isLocalInspectionMode = LocalInspectionMode.current,
-          state = rememberSharedContentState(key = "name-${pokemon.name}"),
+        .sharedBounds(
+          sharedContentState = rememberSharedContentState(key = "name-${pokemon.name}"),
           animatedVisibilityScope = animatedVisibilityScope,
           boundsTransform = boundsTransform,
         )

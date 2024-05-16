@@ -38,12 +38,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
@@ -57,12 +56,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kmpalette.palette.graphics.Palette
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
-import com.skydoves.landscapist.palette.PalettePlugin
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.skydoves.pokedex.compose.core.data.repository.details.FakeDetailsRepository
 import com.skydoves.pokedex.compose.core.designsystem.component.PokedexCircularProgress
 import com.skydoves.pokedex.compose.core.designsystem.component.PokedexText
@@ -110,6 +105,7 @@ fun SharedTransitionScope.PokedexDetails(
   }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun SharedTransitionScope.DetailsHeader(
   animatedVisibilityScope: AnimatedVisibilityScope,
@@ -117,7 +113,7 @@ private fun SharedTransitionScope.DetailsHeader(
   pokemonInfo: PokemonInfo?,
 ) {
   val composeNavigator = currentComposeNavigator
-  var palette by remember { mutableStateOf<Palette?>(null) }
+  //var palette by remember { mutableStateOf<Palette?>(null) }
   val shape = RoundedCornerShape(
     topStart = 0.dp,
     topEnd = 0.dp,
@@ -125,7 +121,8 @@ private fun SharedTransitionScope.DetailsHeader(
     bottomEnd = 64.dp,
   )
 
-  val backgroundBrush by palette.paletteBackgroundBrush()
+  //val backgroundBrush by palette.paletteBackgroundBrush()
+  val backgroundBrush = SolidColor(PokedexTheme.colors.background)
 
   Box(
     modifier = Modifier
@@ -169,6 +166,8 @@ private fun SharedTransitionScope.DetailsHeader(
     )
 
     GlideImage(
+      model = pokemon?.imageUrl,
+      contentDescription = pokemon?.name,
       modifier = Modifier
         .align(Alignment.BottomCenter)
         .padding(bottom = 20.dp)
@@ -179,22 +178,7 @@ private fun SharedTransitionScope.DetailsHeader(
           animatedVisibilityScope = animatedVisibilityScope,
           boundsTransform = boundsTransform,
         ),
-      imageModel = { pokemon?.imageUrl },
-      imageOptions = ImageOptions(contentScale = ContentScale.Inside),
-      component = rememberImageComponent {
-        +CrossfadePlugin()
-
-        if (!LocalInspectionMode.current) {
-          +PalettePlugin(
-            imageModel = pokemon?.imageUrl,
-            useCache = true,
-            paletteLoadedListener = { palette = it },
-          )
-        }
-      },
-      previewPlaceholder = painterResource(
-        id = R.drawable.pokemon_preview,
-      ),
+      contentScale = ContentScale.Inside,
     )
   }
 
@@ -202,9 +186,8 @@ private fun SharedTransitionScope.DetailsHeader(
     modifier = Modifier
       .padding(top = 24.dp)
       .fillMaxWidth()
-      .pokedexSharedElement(
-        isLocalInspectionMode = LocalInspectionMode.current,
-        state = rememberSharedContentState(key = "name-${pokemon?.name}"),
+      .sharedBounds(
+        sharedContentState = rememberSharedContentState(key = "name-${pokemon?.name}"),
         animatedVisibilityScope = animatedVisibilityScope,
         boundsTransform = boundsTransform,
       ),

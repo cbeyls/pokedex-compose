@@ -44,7 +44,6 @@ Go to the [Releases](https://github.com/skydoves/pokedex-compose/releases) to do
 - [Kotlin Serialization](https://github.com/Kotlin/kotlinx.serialization): Kotlin multiplatform / multi-format reflectionless serialization.
 - [ksp](https://github.com/google/ksp): Kotlin Symbol Processing API for code generation and analysis.
 - [Turbine](https://github.com/cashapp/turbine): A small testing library for kotlinx.coroutines Flow.
-- [Landscapist Glide](https://github.com/skydoves/landscapist#glide), [animation](https://github.com/skydoves/landscapist#animation), [placeholder](https://github.com/skydoves/landscapist#placeholder): A pluggable, highly optimized Jetpack Compose and Kotlin Multiplatform image loading library that fetches and displays network images with Glide, Coil, and Fresco.
 - [Baseline Profiles](https://medium.com/proandroiddev/improve-your-android-app-performance-with-baseline-profiles-297f388082e6): Enhances app performance by including specifications of classes and methods in the APK that can be utilized by Android Runtime.
 
 ## Technical Contents
